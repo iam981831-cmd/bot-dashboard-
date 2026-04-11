@@ -4,14 +4,15 @@ import { getAuthFromRequest } from "@/lib/auth"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const { id } = await params
   try {
     const logs = await prisma.activityLog.findMany({
-      where: { botId: params.id },
+      where: { botId: id },
       orderBy: { createdAt: "desc" },
       take: 50,
     })
@@ -29,11 +30,12 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const { id } = await params
   try {
     const { message, type } = await request.json()
 
@@ -41,12 +43,12 @@ export async function POST(
       return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
 
-    const bot = await prisma.bot.findUnique({ where: { id: params.id } })
+    const bot = await prisma.bot.findUnique({ where: { id } })
     if (!bot) return NextResponse.json({ error: "Bot not found" }, { status: 404 })
 
     const log = await prisma.activityLog.create({
       data: {
-        botId: params.id,
+        botId: id,
         message: message.trim(),
         type: type || "info",
       },

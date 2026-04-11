@@ -4,14 +4,15 @@ import { getAuthFromRequest } from "@/lib/auth"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const { id } = await params
   try {
     const logs = await prisma.pingLog.findMany({
-      where: { botId: params.id },
+      where: { botId: id },
       orderBy: { createdAt: "desc" },
       take: 20,
     })

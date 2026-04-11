@@ -33,13 +33,14 @@ function formatBot(bot: {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const { id } = await params
   try {
-    const bot = await prisma.bot.findUnique({ where: { id: params.id } })
+    const bot = await prisma.bot.findUnique({ where: { id } })
     if (!bot) return NextResponse.json({ error: "Bot not found" }, { status: 404 })
     return NextResponse.json(formatBot(bot))
   } catch {
@@ -49,20 +50,21 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const { id } = await params
   try {
     const body = await request.json()
     const { name, description, type, status, baseUrl, apiKey, tags, notes, pingInterval } = body
 
-    const existing = await prisma.bot.findUnique({ where: { id: params.id } })
+    const existing = await prisma.bot.findUnique({ where: { id } })
     if (!existing) return NextResponse.json({ error: "Bot not found" }, { status: 404 })
 
     const bot = await prisma.bot.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: name?.trim() ?? existing.name,
         description: description?.trim() ?? existing.description,
@@ -84,15 +86,16 @@ export async function PUT(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const { id } = await params
   try {
     const body = await request.json()
     const bot = await prisma.bot.update({
-      where: { id: params.id },
+      where: { id },
       data: body,
     })
     return NextResponse.json(formatBot(bot))
@@ -103,13 +106,14 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const { id } = await params
   try {
-    await prisma.bot.delete({ where: { id: params.id } })
+    await prisma.bot.delete({ where: { id } })
     return NextResponse.json({ success: true })
   } catch {
     return NextResponse.json({ error: "Failed to delete bot" }, { status: 500 })
