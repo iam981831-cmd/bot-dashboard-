@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: bot-dashboard
+    env: node
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npx prisma db push && npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ENCRYPTION_KEY
+        sync: false
