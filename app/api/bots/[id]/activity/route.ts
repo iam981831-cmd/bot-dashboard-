@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { getAuthFromRequest } from "@/lib/auth"
 
 export async function GET(
-  request: NextRequest,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
@@ -29,7 +29,7 @@ export async function GET(
 }
 
 export async function POST(
-  request: NextRequest,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)

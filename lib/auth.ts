@@ -25,8 +25,8 @@ export async function verifyToken(token: string): Promise<{ userId: string } | n
   }
 }
 
-export async function getAuthFromRequest(request: NextRequest): Promise<{ userId: string } | null> {
-  const token = request.cookies.get(AUTH_COOKIE)?.value
+export async function getAuthFromRequest(request: Request): Promise<{ userId: string } | null> {
+  const token = (request as NextRequest).cookies.get(AUTH_COOKIE)?.value
   if (!token) return null
   return verifyToken(token)
 }

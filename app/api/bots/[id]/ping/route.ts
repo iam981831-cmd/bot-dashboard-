@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { getAuthFromRequest } from "@/lib/auth"
 
 export async function POST(
-  request: NextRequest,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
@@ -52,13 +52,7 @@ export async function POST(
     }
 
     await prisma.pingLog.create({
-      data: {
-        botId: id,
-        responseTime,
-        statusCode,
-        success,
-        error: errorMsg,
-      },
+      data: { botId: id, responseTime, statusCode, success, error: errorMsg },
     })
 
     // Prune to last 20 logs

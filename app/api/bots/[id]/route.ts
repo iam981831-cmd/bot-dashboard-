@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { getAuthFromRequest } from "@/lib/auth"
 import { encrypt, maskApiKey } from "@/lib/encryption"
@@ -32,7 +32,7 @@ function formatBot(bot: {
 }
 
 export async function GET(
-  request: NextRequest,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
@@ -49,7 +49,7 @@ export async function GET(
 }
 
 export async function PUT(
-  request: NextRequest,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
@@ -85,7 +85,7 @@ export async function PUT(
 }
 
 export async function PATCH(
-  request: NextRequest,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
@@ -105,7 +105,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await getAuthFromRequest(request)
