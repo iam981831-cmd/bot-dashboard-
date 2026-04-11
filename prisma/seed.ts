@@ -6,23 +6,32 @@ import { encrypt } from "../lib/encryption"
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log("🌱 Seeding database…")
+  console.log("🌱 Running seed…")
 
-  // Create admin user (delete existing first)
-  await prisma.user.deleteMany()
-  const hashedPassword = await bcrypt.hash(
-    process.env.ADMIN_PASSWORD || "admin123",
-    12
-  )
-  await prisma.user.create({
-    data: { passwordHash: hashedPassword },
-  })
-  console.log("✅ Admin user created")
+  // Upsert admin user — safe to run on every startup
+  const existingUser = await prisma.user.findFirst()
+  if (!existingUser) {
+    const hashedPassword = await bcrypt.hash(
+      process.env.ADMIN_PASSWORD || "admin123",
+      12
+    )
+    await prisma.user.create({
+      data: { passwordHash: hashedPassword },
+    })
+    console.log("✅ Admin user created")
+  } else {
+    console.log("✅ Admin user already exists — skipping")
+  }
 
-  // Clear existing bots
-  await prisma.bot.deleteMany()
+  // Only seed demo bots if the database is empty
+  const botCount = await prisma.bot.count()
+  if (botCount > 0) {
+    console.log(`✅ ${botCount} bots already exist — skipping demo seed`)
+    return
+  }
 
-  // Create demo bots
+  console.log("🤖 Seeding demo bots…")
+
   const bot1 = await prisma.bot.create({
     data: {
       name: "Telegram Notifier",
@@ -67,9 +76,6 @@ async function main() {
     },
   })
 
-  console.log(`✅ Created ${3} demo bots`)
-
-  // Activity logs
   await prisma.activityLog.createMany({
     data: [
       { botId: bot1.id, message: "Bot deployed to production VPS", type: "success" },
@@ -82,7 +88,6 @@ async function main() {
     ],
   })
 
-  // Ping logs
   await prisma.pingLog.createMany({
     data: [
       { botId: bot1.id, responseTime: 145, statusCode: 200, success: true },
@@ -94,10 +99,9 @@ async function main() {
     ],
   })
 
-  console.log("✅ Activity and ping logs created")
-  console.log("")
+  console.log("✅ Demo bots, activity logs, and ping history created")
   console.log(`🔑 Admin password: ${process.env.ADMIN_PASSWORD || "admin123"}`)
-  console.log("🚀 Ready! Run: npm run dev")
+  console.log("🚀 Ready!")
 }
 
 main()
