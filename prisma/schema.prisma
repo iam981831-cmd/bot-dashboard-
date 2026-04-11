@@ -1,0 +1,54 @@
+// Prisma Schema for Bot Management Dashboard
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Bot {
+  id              String        @id @default(cuid())
+  name            String
+  description     String?
+  type            String        @default("Custom API")
+  status          String        @default("Inactive")
+  baseUrl         String?
+  apiKeyEncrypted String?
+  tags            String        @default("[]")
+  notes           String?
+  pingInterval    Int?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  lastSeenAt      DateTime?
+  pingLogs        PingLog[]
+  activityLogs    ActivityLog[]
+}
+
+model PingLog {
+  id           String   @id @default(cuid())
+  botId        String
+  bot          Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  responseTime Int?
+  statusCode   Int?
+  success      Boolean
+  error        String?
+  createdAt    DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  botId     String
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  message   String
+  type      String   @default("info")
+  createdAt DateTime @default(now())
+}
