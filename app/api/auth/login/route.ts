@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/db"
 import { signToken, AUTH_COOKIE } from "@/lib/auth"
 
+const DEFAULT_PASSWORD = process.env.ADMIN_PASSWORD || "admin123"
+
 export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json()
@@ -11,9 +13,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Password is required" }, { status: 400 })
     }
 
-    const user = await prisma.user.findFirst()
+    let user = await prisma.user.findFirst()
+
+    // Auto-create admin user on first login if none exists
     if (!user) {
-      return NextResponse.json({ error: "No admin user found. Run db:seed first." }, { status: 401 })
+      const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 12)
+      user = await prisma.user.create({ data: { passwordHash } })
     }
 
     const valid = await bcrypt.compare(password, user.passwordHash)
@@ -28,7 +33,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
       path: "/",
     })
 
