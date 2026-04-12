@@ -20,7 +20,7 @@ import type { Bot } from "@/types"
 const BOT_TYPES = ["Telegram", "Discord", "WhatsApp", "Slack", "Custom API", "Other"]
 const BOT_STATUSES = ["Active", "Inactive", "Error", "Maintenance"]
 const PING_INTERVALS = [
-  { label: "No auto-ping", value: "" },
+  { label: "No auto-ping", value: "none" },
   { label: "Every 5 minutes", value: "5" },
   { label: "Every 15 minutes", value: "15" },
   { label: "Every 30 minutes", value: "30" },
@@ -45,7 +45,7 @@ export function BotForm({ bot, mode }: BotFormProps) {
     apiKey: "",
     tags: bot?.tags?.join(", ") ?? "",
     notes: bot?.notes ?? "",
-    pingInterval: bot?.pingInterval?.toString() ?? "",
+    pingInterval: bot?.pingInterval?.toString() ?? "none",
   })
 
   const handleChange = (field: string, value: string) => {
@@ -73,7 +73,7 @@ export function BotForm({ bot, mode }: BotFormProps) {
           .map((t) => t.trim())
           .filter(Boolean),
         notes: form.notes.trim() || null,
-        pingInterval: form.pingInterval ? parseInt(form.pingInterval) : null,
+        pingInterval: form.pingInterval && form.pingInterval !== "none" ? parseInt(form.pingInterval) : null,
       }
 
       const url = mode === "create" ? "/api/bots" : `/api/bots/${bot!.id}`
