@@ -51,3 +51,16 @@ export interface BotStats {
   error: number
   maintenance: number
 }
+
+export interface StatPeriod {
+  conversations: number
+  appointments: number
+  unanswered: number
+}
+
+export interface BotConversationStats {
+  today: StatPeriod
+  week: StatPeriod
+  month: StatPeriod
+  total: StatPeriod
+}

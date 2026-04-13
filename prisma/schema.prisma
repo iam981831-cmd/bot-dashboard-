@@ -29,8 +29,9 @@ model Bot {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   lastSeenAt      DateTime?
-  pingLogs        PingLog[]
-  activityLogs    ActivityLog[]
+  pingLogs          PingLog[]
+  activityLogs      ActivityLog[]
+  conversationStats ConversationStat[]
 }
 
 model PingLog {
@@ -51,4 +52,14 @@ model ActivityLog {
   message   String
   type      String   @default("info")
   createdAt DateTime @default(now())
+}
+
+model ConversationStat {
+  id            String   @id @default(cuid())
+  botId         String
+  bot           Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  conversations Int      @default(0)
+  appointments  Int      @default(0)
+  unanswered    Int      @default(0)
+  createdAt     DateTime @default(now())
 }
