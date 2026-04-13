@@ -68,11 +68,14 @@ export async function POST(
       })
     }
 
+    const newStatus =
+      success && (responseTime ?? Infinity) < 500 ? "Active" : "Error"
+
     await prisma.bot.update({
       where: { id },
       data: {
         lastSeenAt: success ? new Date() : undefined,
-        status: !success && bot.status === "Active" ? "Error" : undefined,
+        status: newStatus,
       },
     })
 

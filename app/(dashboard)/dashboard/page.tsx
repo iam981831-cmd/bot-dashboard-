@@ -44,7 +44,11 @@ export default function DashboardPage() {
     }
   }, [])
 
-  useEffect(() => { fetchBots() }, [fetchBots])
+  useEffect(() => {
+    fetchBots()
+    const interval = setInterval(fetchBots, 5 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [fetchBots])
 
   const filtered = bots.filter((b) => {
     const matchSearch =
