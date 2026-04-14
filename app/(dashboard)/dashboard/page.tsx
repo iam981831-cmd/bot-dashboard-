@@ -14,6 +14,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card"
 import { StatsCards } from "@/components/stats-cards"
 import { BotCard } from "@/components/bot-card"
+import { TokenStats } from "@/components/token-stats"
 import type { Bot as BotType, BotStats } from "@/types"
 
 export default function DashboardPage() {
@@ -137,6 +138,9 @@ export default function DashboardPage() {
 
       {/* Full stats */}
       {!loading && <StatsCards stats={stats} />}
+
+      {/* Token usage */}
+      {!loading && <TokenStats />}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">

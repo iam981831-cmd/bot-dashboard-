@@ -63,3 +63,10 @@ model ConversationStat {
   unanswered    Int      @default(0)
   createdAt     DateTime @default(now())
 }
+
+model UsageLog {
+  id        String   @id @default(cuid())
+  botId     String
+  tokens    Int
+  createdAt DateTime @default(now())
+}
